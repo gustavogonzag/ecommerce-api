@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Swagger UI - E-commerce</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist/swagger-ui.css" />
+
+    <style>
+        body {
+            margin: 0;
+            background: #0f172a;
+        }
+
+        /* fundo geral */
+        .swagger-ui {
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+
+        /* textos */
+        .swagger-ui,
+        .swagger-ui .info,
+        .swagger-ui .info p,
+        .swagger-ui .info hgroup.main h2 {
+            color: #e2e8f0;
+        }
+
+        /* cards dos endpoints */
+        .swagger-ui .opblock {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 10px;
+        }
+
+        /* headers dos endpoints */
+        .swagger-ui .opblock-summary {
+            background: #020617;
+            border-bottom: 1px solid #334155;
+        }
+
+        /* método GET */
+        .swagger-ui .opblock-get {
+            border-left: 5px solid #22c55e;
+        }
+
+        /* método POST */
+        .swagger-ui .opblock-post {
+            border-left: 5px solid #3b82f6;
+        }
+
+        /* método PATCH */
+        .swagger-ui .opblock-patch {
+            border-left: 5px solid #eab308;
+        }
+
+        /* botão try it out */
+        .swagger-ui .btn.try-out__btn {
+            background: #38bdf8;
+            color: #020617;
+            border: none;
+        }
+
+        /* botão execute */
+        .swagger-ui .btn.execute {
+            background: #22c55e;
+            color: #020617;
+        }
+
+        /* inputs */
+        .swagger-ui input,
+        .swagger-ui textarea {
+            background: #020617;
+            color: #e2e8f0;
+            border: 1px solid #334155;
+        }
+
+        /* select */
+        .swagger-ui select {
+            background: #020617;
+            color: #e2e8f0;
+        }
+
+        /* response box */
+        .swagger-ui .responses-inner {
+            background: #020617;
+        }
+
+        /* json */
+        .swagger-ui pre {
+            background: #020617;
+            color: #e2e8f0;
+        }
+
+        /* authorize botão */
+        .swagger-ui .authorize {
+            background: #1e293b !important;
+            color: #e2e8f0 !important;
+            border: 1px solid #38bdf8 !important;
+        }
+
+        /* modal authorize */
+        .swagger-ui .dialog-ux {
+            background: #1e293b !important;
+            color: #e2e8f0 !important;
+        }
+
+        /* botões dentro do modal */
+        .swagger-ui .dialog-ux .btn {
+            background: #38bdf8 !important;
+            color: #020617 !important;
+        }
+
+        /* topbar (logo swagger) */
+        .swagger-ui .topbar {
+            background-color: #020617;
+        }
+
+        /* remover fundo branco */
+        .swagger-ui .scheme-container {
+            background: #0f172a !important;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="swagger-ui"></div>
+
+<script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"></script>
+
+<script>
+    const spec = {
+        openapi: "3.0.0",
+        info: {
+            title: "E-commerce API",
+            version: "1.0.0"
+        },
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: "http",
+                    scheme: "bearer",
+                    bearerFormat: "JWT"
+                }
+            },
+            schemas: {
+                ErroResposta: {
+                    type: "object",
+                    properties: {
+                        timestamp: { type: "string", example: "2026-03-29T16:10:00" },
+                        status: { type: "integer", example: 404 },
+                        erro: { type: "string", example: "Not Found" },
+                        mensagem: { type: "string", example: "Produto não encontrado" },
+                        path: { type: "string", example: "/produtos/999" }
+                    }
+                }
+            }
+        },
+        security: [
+            { bearerAuth: [] }
+        ],
+        paths: {
+
+            "/auth/login": {
+                post: {
+                    summary: "Login",
+                    requestBody: {
+                        required: true,
+                        content: {
+                            "application/json": {
+                                example: {
+                                    username: "admin",
+                                    password: "123"
+                                }
+                            }
+                        }
+                    },
+                    responses: {
+                        "200": {
+                            description: "Login realizado com sucesso",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        token: "eyJhbGciOiJIUzI1NiJ9.exemplo.token"
+                                    }
+                                }
+                            }
+                        },
+                        "400": {
+                            description: "Credenciais inválidas",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        timestamp: "2026-03-29T16:10:00",
+                                        status: 400,
+                                        erro: "Bad Request",
+                                        mensagem: "Senha inválida",
+                                        path: "/auth/login"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+
+            "/pedidos": {
+                get: {
+                    summary: "Listar pedidos paginados",
+                    parameters: [
+                        { name: "page", in: "query", example: 0 },
+                        { name: "size", in: "query", example: 5 },
+                        { name: "sort", in: "query", example: "dataCriacao,desc" },
+                        { name: "status", in: "query", example: "PENDENTE" }
+                    ],
+                    responses: {
+                        "200": {
+                            description: "Pedidos retornados com sucesso",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        content: [
+                                            {
+                                                id: 1,
+                                                cliente: {
+                                                    nome: "Gustavo",
+                                                    telefone: "999999999",
+                                                    endereco: "Rua A",
+                                                    bairroId: 1
+                                                },
+                                                itens: [
+                                                    {
+                                                        produtoId: 1,
+                                                        quantidade: 2,
+                                                        preco: 12.5
+                                                    }
+                                                ],
+                                                cupomId: null,
+                                                formaPagamento: "PIX",
+                                                status: "PENDENTE",
+                                                dataCriacao: "2026-03-29T15:40:00",
+                                                total: 30.0
+                                            }
+                                        ],
+                                        totalElements: 1,
+                                        totalPages: 1,
+                                        size: 5,
+                                        number: 0
+                                    }
+                                }
+                            }
+                        },
+                        "401": {
+                            description: "Não autenticado"
+                        }
+                    }
+                }
+            },
+
+            "/pedidos/{id}/status": {
+                patch: {
+                    summary: "Atualizar status do pedido",
+                    parameters: [
+                        {
+                            name: "id",
+                            in: "path",
+                            required: true,
+                            example: 1
+                        }
+                    ],
+                    requestBody: {
+                        required: true,
+                        content: {
+                            "application/json": {
+                                example: {
+                                    status: "APROVADO"
+                                }
+                            }
+                        }
+                    },
+                    responses: {
+                        "200": {
+                            description: "Status atualizado"
+                        }
+                    }
+                }
+            },
+
+            "/produtos": {
+                get: {
+                    summary: "Listar produtos",
+                    responses: {
+                        "200": {
+                            description: "Lista de produtos retornada com sucesso",
+                            content: {
+                                "application/json": {
+                                    example: [
+                                        {
+                                            id: 1,
+                                            nome: "Coca-Cola 2L",
+                                            descricao: "Refrigerante 2 litros",
+                                            preco: 12.5,
+                                            ativo: true,
+                                            categoriaId: 1,
+                                            urlImagem: "https://meusite.com/imagens/coca-cola-2l.png"
+                                        },
+                                        {
+                                            id: 2,
+                                            nome: "Hambúrguer Artesanal",
+                                            descricao: "Pão, carne e queijo",
+                                            preco: 25.0,
+                                            ativo: true,
+                                            categoriaId: 2,
+                                            urlImagem: "https://meusite.com/imagens/hamburguer-artesanal.png"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "401": {
+                            description: "Não autenticado"
+                        }
+                    }
+                },
+                post: {
+                    summary: "Criar produto",
+                    requestBody: {
+                        content: {
+                            "application/json": {
+                                example: {
+                                    nome: "Produto X",
+                                    descricao: "Descrição do produto",
+                                    preco: 50.0,
+                                    categoriaId: 1,
+                                    ativo: true,
+                                    urlImagem: "https://meusite.com/imagens/produto-x.png"
+                                }
+                            }
+                        }
+                    },
+                    responses: {
+                        "200": {
+                            description: "Produto criado com sucesso",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        id: 3,
+                                        nome: "Produto X",
+                                        descricao: "Descrição do produto",
+                                        preco: 50.0,
+                                        categoriaId: 1,
+                                        ativo: true,
+                                        urlImagem: "https://meusite.com/imagens/produto-x.png"
+                                    }
+                                }
+                            }
+                        },
+                        "404": {
+                            description: "Categoria não encontrada",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        timestamp: "2026-03-29T16:10:00",
+                                        status: 404,
+                                        erro: "Not Found",
+                                        mensagem: "Categoria não encontrada",
+                                        path: "/produtos"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+
+            "/produtos/{id}": {
+                get: {
+                    summary: "Buscar produto por ID",
+                    parameters: [
+                        { name: "id", in: "path", required: true, example: 1 }
+                    ],
+                    responses: {
+                        "200": {
+                            description: "Produto encontrado",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        id: 1,
+                                        nome: "Coca-Cola 2L",
+                                        descricao: "Refrigerante 2 litros",
+                                        preco: 12.5,
+                                        ativo: true,
+                                        categoriaId: 1,
+                                        urlImagem: "https://meusite.com/imagens/coca-cola-2l.png"
+                                    }
+                                }
+                            }
+                        },
+                        "404": {
+                            description: "Produto não encontrado",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        timestamp: "2026-03-29T16:10:00",
+                                        status: 404,
+                                        erro: "Not Found",
+                                        mensagem: "Produto não encontrado",
+                                        path: "/produtos/999"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                put: {
+                    summary: "Atualizar produto",
+                    parameters: [
+                        { name: "id", in: "path", required: true, example: 1 }
+                    ],
+                    requestBody: {
+                        content: {
+                            "application/json": {
+                                example: {
+                                    nome: "Produto atualizado",
+                                    descricao: "Nova descrição",
+                                    preco: 60.0,
+                                    categoriaId: 1,
+                                    ativo: true,
+                                    urlImagem: "https://meusite.com/imagens/produto-atualizado.png"
+                                }
+                            }
+                        }
+                    },
+                    responses: {
+                        "200": {
+                            description: "Produto atualizado com sucesso",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        id: 1,
+                                        nome: "Produto atualizado",
+                                        descricao: "Nova descrição",
+                                        preco: 60.0,
+                                        categoriaId: 1,
+                                        ativo: true,
+                                        urlImagem: "https://meusite.com/imagens/produto-atualizado.png"
+                                    }
+                                }
+                            }
+                        },
+                        "404": {
+                            description: "Produto ou categoria não encontrado",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        timestamp: "2026-03-29T16:10:00",
+                                        status: 404,
+                                        erro: "Not Found",
+                                        mensagem: "Produto não encontrado",
+                                        path: "/produtos/999"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                delete: {
+                    summary: "Deletar produto",
+                    parameters: [
+                        { name: "id", in: "path", required: true, example: 1 }
+                    ],
+                    responses: {
+                        "200": {
+                            description: "Produto removido com sucesso"
+                        },
+                        "404": {
+                            description: "Produto não encontrado",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        timestamp: "2026-03-29T16:10:00",
+                                        status: 404,
+                                        erro: "Not Found",
+                                        mensagem: "Produto não encontrado",
+                                        path: "/produtos/999"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+
+            "/categorias": {
+                get: {
+                    summary: "Listar categorias",
+                    responses: {
+                        "200": {
+                            description: "Lista de categorias retornada com sucesso",
+                            content: {
+                                "application/json": {
+                                    example: [
+                                        { id: 1, nome: "Bebidas" },
+                                        { id: 2, nome: "Lanches" }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                post: {
+                    summary: "Criar categoria",
+                    requestBody: {
+                        required: true,
+                        content: {
+                            "application/json": {
+                                example: {
+                                    nome: "Sobremesas"
+                                }
+                            }
+                        }
+                    },
+                    responses: {
+                        "200": {
+                            description: "Categoria criada com sucesso",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        id: 3,
+                                        nome: "Sobremesas"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+
+            "/categorias/{id}": {
+                get: {
+                    summary: "Buscar categoria por ID",
+                    parameters: [
+                        { name: "id", in: "path", required: true, example: 1 }
+                    ],
+                    responses: {
+                        "200": {
+                            description: "Categoria encontrada",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        id: 1,
+                                        nome: "Bebidas"
+                                    }
+                                }
+                            }
+                        },
+                        "404": {
+                            description: "Categoria não encontrada",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        timestamp: "2026-03-29T16:10:00",
+                                        status: 404,
+                                        erro: "Not Found",
+                                        mensagem: "Categoria não encontrada",
+                                        path: "/categorias/999"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+
+                put: {
+                    summary: "Atualizar categoria",
+                    parameters: [
+                        { name: "id", in: "path", required: true, example: 1 }
+                    ],
+                    requestBody: {
+                        required: true,
+                        content: {
+                            "application/json": {
+                                example: {
+                                    nome: "Categoria Atualizada"
+                                }
+                            }
+                        }
+                    },
+                    responses: {
+                        "200": {
+                            description: "Categoria atualizada com sucesso",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        id: 1,
+                                        nome: "Categoria Atualizada"
+                                    }
+                                }
+                            }
+                        },
+                        "404": {
+                            description: "Categoria não encontrada",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        timestamp: "2026-03-29T16:10:00",
+                                        status: 404,
+                                        erro: "Not Found",
+                                        mensagem: "Categoria não encontrada",
+                                        path: "/categorias/999"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+
+                delete: {
+                    summary: "Deletar categoria",
+                    parameters: [
+                        { name: "id", in: "path", required: true, example: 1 }
+                    ],
+                    responses: {
+                        "200": {
+                            description: "Categoria removida com sucesso"
+                        },
+                        "404": {
+                            description: "Categoria não encontrada",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        timestamp: "2026-03-29T16:10:00",
+                                        status: 404,
+                                        erro: "Not Found",
+                                        mensagem: "Categoria não encontrada",
+                                        path: "/categorias/999"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+
+            "/bairros": {
+                get: {
+                    summary: "Listar bairros",
+                    responses: {
+                        "200": {
+                            description: "Lista de bairros retornada com sucesso",
+                            content: {
+                                "application/json": {
+                                    example: [
+                                        {
+                                            id: 1,
+                                            nome: "Centro",
+                                            taxaEntrega: 10.0
+                                        },
+                                        {
+                                            id: 2,
+                                            nome: "São Caetano",
+                                            taxaEntrega: 15.0
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+
+                post: {
+                    summary: "Criar bairro",
+                    requestBody: {
+                        required: true,
+                        content: {
+                            "application/json": {
+                                example: {
+                                    nome: "Novo Bairro",
+                                    taxaEntrega: 12.5
+                                }
+                            }
+                        }
+                    },
+                    responses: {
+                        "200": {
+                            description: "Bairro criado com sucesso",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        id: 3,
+                                        nome: "Novo Bairro",
+                                        taxaEntrega: 12.5
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+
+            "/bairros/{id}": {
+                get: {
+                    summary: "Buscar bairro por ID",
+                    parameters: [
+                        { name: "id", in: "path", required: true, example: 1 }
+                    ],
+                    responses: {
+                        "200": {
+                            description: "Bairro encontrado",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        id: 1,
+                                        nome: "Centro",
+                                        taxaEntrega: 10.0
+                                    }
+                                }
+                            }
+                        },
+                        "404": {
+                            description: "Bairro não encontrado",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        timestamp: "2026-03-29T16:10:00",
+                                        status: 404,
+                                        erro: "Not Found",
+                                        mensagem: "Bairro não encontrado",
+                                        path: "/bairros/999"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+
+                put: {
+                    summary: "Atualizar bairro",
+                    parameters: [
+                        { name: "id", in: "path", required: true, example: 1 }
+                    ],
+                    requestBody: {
+                        required: true,
+                        content: {
+                            "application/json": {
+                                example: {
+                                    nome: "Centro Atualizado",
+                                    taxaEntrega: 15.0
+                                }
+                            }
+                        }
+                    },
+                    responses: {
+                        "200": {
+                            description: "Bairro atualizado com sucesso",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        id: 1,
+                                        nome: "Centro Atualizado",
+                                        taxaEntrega: 15.0
+                                    }
+                                }
+                            }
+                        },
+                        "404": {
+                            description: "Bairro não encontrado",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        timestamp: "2026-03-29T16:10:00",
+                                        status: 404,
+                                        erro: "Not Found",
+                                        mensagem: "Bairro não encontrado",
+                                        path: "/bairros/999"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+
+                delete: {
+                    summary: "Deletar bairro",
+                    parameters: [
+                        { name: "id", in: "path", required: true, example: 1 }
+                    ],
+                    responses: {
+                        "200": {
+                            description: "Bairro removido com sucesso"
+                        },
+                        "404": {
+                            description: "Bairro não encontrado",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        timestamp: "2026-03-29T16:10:00",
+                                        status: 404,
+                                        erro: "Not Found",
+                                        mensagem: "Bairro não encontrado",
+                                        path: "/bairros/999"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+    };
+
+    SwaggerUIBundle({
+        spec: spec,
+        dom_id: '#swagger-ui'
+    });
+</script>
+
+</body>
+</html>
