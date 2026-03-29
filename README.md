@@ -118,7 +118,7 @@ config/
 ### 1. Clone o repositório
 
 ```bash id="clone01"
-git clone https://github.com/seu-usuario/ecommerce-api.git
+git clone https://github.com/gustavogonzag/ecommerce-api.git
 ```
 
 ---
