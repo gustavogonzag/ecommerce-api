@@ -28,4 +28,6 @@ public class PedidoDTO {
     private LocalDateTime dataCriacao;
 
     private Double total;
+
+    private String observacao;
 }

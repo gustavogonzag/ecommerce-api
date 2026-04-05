@@ -2,128 +2,326 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Swagger UI - E-commerce</title>
+    <title>E-commerce API Docs</title>
 
     <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist/swagger-ui.css" />
 
     <style>
-        body {
+        :root {
+            --bg: #0b1220;
+            --bg-soft: #111827;
+            --card: #172033;
+            --card-2: #1e293b;
+            --border: #334155;
+            --text: #e5edf8;
+            --muted: #94a3b8;
+            --accent: #38bdf8;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --post: #3b82f6;
+            --get: #22c55e;
+            --patch: #f59e0b;
+            --put: #a855f7;
+            --delete: #ef4444;
+        }
+
+        html, body {
             margin: 0;
-            background: #0f172a;
+            padding: 0;
+            background:
+                    radial-gradient(circle at top, rgba(56,189,248,0.08), transparent 30%),
+                    linear-gradient(180deg, #0b1220 0%, #0f172a 100%);
+            color: var(--text);
+            font-family: Inter, Arial, sans-serif;
         }
 
-        /* fundo geral */
+        body {
+            min-height: 100vh;
+        }
+
+        .custom-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(8px);
+            background: rgba(11,18,32,0.82);
+            border-bottom: 1px solid rgba(148,163,184,0.15);
+            padding: 18px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 20px;
+            color: #f8fafc;
+        }
+
+        .brand p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .header-badge {
+            padding: 8px 12px;
+            border: 1px solid rgba(56,189,248,0.35);
+            background: rgba(56,189,248,0.1);
+            color: #cbefff;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        #swagger-ui {
+            padding: 18px;
+        }
+
         .swagger-ui {
-            background-color: #0f172a;
-            color: #e2e8f0;
+            background: transparent;
+            color: var(--text);
         }
 
-        /* textos */
-        .swagger-ui,
-        .swagger-ui .info,
-        .swagger-ui .info p,
-        .swagger-ui .info hgroup.main h2 {
-            color: #e2e8f0;
+        .swagger-ui .wrapper {
+            max-width: 1300px;
         }
 
-        /* cards dos endpoints */
-        .swagger-ui .opblock {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 10px;
-        }
-
-        /* headers dos endpoints */
-        .swagger-ui .opblock-summary {
-            background: #020617;
-            border-bottom: 1px solid #334155;
-        }
-
-        /* método GET */
-        .swagger-ui .opblock-get {
-            border-left: 5px solid #22c55e;
-        }
-
-        /* método POST */
-        .swagger-ui .opblock-post {
-            border-left: 5px solid #3b82f6;
-        }
-
-        /* método PATCH */
-        .swagger-ui .opblock-patch {
-            border-left: 5px solid #eab308;
-        }
-
-        /* botão try it out */
-        .swagger-ui .btn.try-out__btn {
-            background: #38bdf8;
-            color: #020617;
-            border: none;
-        }
-
-        /* botão execute */
-        .swagger-ui .btn.execute {
-            background: #22c55e;
-            color: #020617;
-        }
-
-        /* inputs */
-        .swagger-ui input,
-        .swagger-ui textarea {
-            background: #020617;
-            color: #e2e8f0;
-            border: 1px solid #334155;
-        }
-
-        /* select */
-        .swagger-ui select {
-            background: #020617;
-            color: #e2e8f0;
-        }
-
-        /* response box */
-        .swagger-ui .responses-inner {
-            background: #020617;
-        }
-
-        /* json */
-        .swagger-ui pre {
-            background: #020617;
-            color: #e2e8f0;
-        }
-
-        /* authorize botão */
-        .swagger-ui .authorize {
-            background: #1e293b !important;
-            color: #e2e8f0 !important;
-            border: 1px solid #38bdf8 !important;
-        }
-
-        /* modal authorize */
-        .swagger-ui .dialog-ux {
-            background: #1e293b !important;
-            color: #e2e8f0 !important;
-        }
-
-        /* botões dentro do modal */
-        .swagger-ui .dialog-ux .btn {
-            background: #38bdf8 !important;
-            color: #020617 !important;
-        }
-
-        /* topbar (logo swagger) */
         .swagger-ui .topbar {
-            background-color: #020617;
+            display: none;
         }
 
-        /* remover fundo branco */
         .swagger-ui .scheme-container {
-            background: #0f172a !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 0 16px 0 !important;
+        }
+
+        .swagger-ui .info {
+            margin: 0 0 20px 0;
+            padding: 20px 22px;
+            background: rgba(23,32,51,0.85);
+            border: 1px solid rgba(148,163,184,0.14);
+            border-radius: 20px;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.25);
+        }
+
+        .swagger-ui .info .title,
+        .swagger-ui .info hgroup.main h2,
+        .swagger-ui .info p,
+        .swagger-ui .info li,
+        .swagger-ui,
+        .swagger-ui .opblock-summary-path,
+        .swagger-ui .opblock-summary-description,
+        .swagger-ui .response-col_status,
+        .swagger-ui .response-col_description,
+        .swagger-ui .tab li,
+        .swagger-ui label,
+        .swagger-ui .parameter__name,
+        .swagger-ui .parameter__type,
+        .swagger-ui .parameter__deprecated,
+        .swagger-ui .parameter__in,
+        .swagger-ui .responses-inner h4,
+        .swagger-ui .responses-inner h5,
+        .swagger-ui .model-title,
+        .swagger-ui .prop-type,
+        .swagger-ui .prop-format,
+        .swagger-ui .opblock-description-wrapper p,
+        .swagger-ui .opblock-external-docs-wrapper p,
+        .swagger-ui .opblock-title_normal p {
+            color: var(--text) !important;
+        }
+
+        .swagger-ui .info .base-url {
+            color: var(--muted) !important;
+        }
+
+        .swagger-ui .opblock-tag {
+            margin: 28px 0 14px;
+            padding: 10px 4px;
+            border-bottom: 1px solid rgba(148,163,184,0.14);
+            color: #f8fafc !important;
+        }
+
+        .swagger-ui .opblock {
+            background: rgba(23,32,51,0.9);
+            border: 1px solid rgba(148,163,184,0.14);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 10px 28px rgba(0,0,0,0.20);
+            margin-bottom: 18px;
+        }
+
+        .swagger-ui .opblock-summary {
+            background: rgba(2,6,23,0.68);
+            border-bottom: 1px solid rgba(148,163,184,0.14);
+            padding: 8px 0;
+        }
+
+        .swagger-ui .opblock.opblock-get {
+            border-left: 5px solid var(--get);
+        }
+
+        .swagger-ui .opblock.opblock-post {
+            border-left: 5px solid var(--post);
+        }
+
+        .swagger-ui .opblock.opblock-patch {
+            border-left: 5px solid var(--patch);
+        }
+
+        .swagger-ui .opblock.opblock-put {
+            border-left: 5px solid var(--put);
+        }
+
+        .swagger-ui .opblock.opblock-delete {
+            border-left: 5px solid var(--delete);
+        }
+
+        .swagger-ui .opblock-summary-method {
+            border-radius: 999px;
+            min-width: 82px;
+            font-weight: 700;
+        }
+
+        .swagger-ui .btn,
+        .swagger-ui .authorize {
+            border-radius: 12px !important;
+            border: 1px solid rgba(148,163,184,0.18) !important;
+            transition: 0.2s ease;
+        }
+
+        .swagger-ui .authorize {
+            background: rgba(56,189,248,0.10) !important;
+            color: var(--text) !important;
+            border: 1px solid rgba(56,189,248,0.35) !important;
+        }
+
+        .swagger-ui .authorize:hover,
+        .swagger-ui .btn:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px);
+        }
+
+        .swagger-ui .btn.try-out__btn {
+            background: var(--accent) !important;
+            color: #06131f !important;
+            border: none !important;
+        }
+
+        .swagger-ui .btn.execute {
+            background: var(--success) !important;
+            color: #07140a !important;
+            border: none !important;
+        }
+
+        .swagger-ui .btn.cancel {
+            background: #334155 !important;
+            color: var(--text) !important;
+        }
+
+        .swagger-ui input,
+        .swagger-ui textarea,
+        .swagger-ui select {
+            background: #0b1220 !important;
+            color: var(--text) !important;
+            border: 1px solid rgba(148,163,184,0.18) !important;
+            border-radius: 12px !important;
+        }
+
+        .swagger-ui textarea {
+            min-height: 160px;
+        }
+
+        .swagger-ui .responses-inner,
+        .swagger-ui .tab,
+        .swagger-ui .model-box,
+        .swagger-ui section.models {
+            background: transparent !important;
+        }
+
+        .swagger-ui pre,
+        .swagger-ui .microlight {
+            background: #08111f !important;
+            color: #dbeafe !important;
+            border: 1px solid rgba(148,163,184,0.12);
+            border-radius: 14px;
+        }
+
+        .swagger-ui .response-control-media-type__accept-message {
+            color: var(--muted) !important;
+        }
+
+        .swagger-ui .dialog-ux {
+            background: #111827 !important;
+            border: 1px solid rgba(148,163,184,0.18) !important;
+            border-radius: 18px !important;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+        }
+
+        .swagger-ui .dialog-ux .modal-ux-header {
+            background: #0b1220 !important;
+            border-bottom: 1px solid rgba(148,163,184,0.14) !important;
+        }
+
+        .swagger-ui .dialog-ux .modal-ux-content {
+            background: #111827 !important;
+        }
+
+        .swagger-ui .dialog-ux .btn.modal-btn.auth {
+            background: var(--accent) !important;
+            color: #06131f !important;
+        }
+
+        .swagger-ui .dialog-ux .btn.modal-btn {
+            color: var(--text) !important;
+        }
+
+        .swagger-ui .model-example {
+            background: #08111f !important;
+        }
+
+        .swagger-ui .markdown p,
+        .swagger-ui .markdown code,
+        .swagger-ui .renderedMarkdown p,
+        .swagger-ui .renderedMarkdown code {
+            color: var(--text) !important;
+        }
+
+        .swagger-ui .responses-table .response-col_status {
+            font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            .custom-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            #swagger-ui {
+                padding: 12px;
+            }
         }
     </style>
 </head>
 
 <body>
+<div class="custom-header">
+    <div class="brand">
+        <h1>🛒 E-commerce API</h1>
+        <p>Documentação interativa • Dark Mode • JWT • Pedidos personalizados</p>
+    </div>
+    <div class="header-badge">Java 17 • Spring Boot</div>
+</div>
 
 <div id="swagger-ui"></div>
 
@@ -134,7 +332,8 @@
         openapi: "3.0.0",
         info: {
             title: "E-commerce API",
-            version: "1.0.0"
+            version: "1.1.0",
+            description: "API REST para gerenciamento de produtos, categorias, bairros, autenticação e pedidos com observações, acréscimos e remoções."
         },
         components: {
             securitySchemes: {
@@ -161,9 +360,9 @@
             { bearerAuth: [] }
         ],
         paths: {
-
             "/auth/login": {
                 post: {
+                    tags: ["Autenticação"],
                     summary: "Login",
                     requestBody: {
                         required: true,
@@ -207,6 +406,7 @@
 
             "/pedidos": {
                 get: {
+                    tags: ["Pedidos"],
                     summary: "Listar pedidos paginados",
                     parameters: [
                         { name: "page", in: "query", example: 0 },
@@ -229,18 +429,34 @@
                                                     endereco: "Rua A",
                                                     bairroId: 1
                                                 },
+                                                observacao: "Entregar sem tocar a campainha",
                                                 itens: [
                                                     {
                                                         produtoId: 1,
                                                         quantidade: 2,
-                                                        preco: 12.5
+                                                        preco: 25.0,
+                                                        observacao: "Bem passado",
+                                                        acrescimos: [
+                                                            {
+                                                                nome: "Queijo extra",
+                                                                preco: 3.0
+                                                            },
+                                                            {
+                                                                nome: "Bacon",
+                                                                preco: 4.0
+                                                            }
+                                                        ],
+                                                        remocoes: [
+                                                            { nome: "Cebola" },
+                                                            { nome: "Picles" }
+                                                        ]
                                                     }
                                                 ],
                                                 cupomId: null,
                                                 formaPagamento: "PIX",
                                                 status: "PENDENTE",
                                                 dataCriacao: "2026-03-29T15:40:00",
-                                                total: 30.0
+                                                total: 74.0
                                             }
                                         ],
                                         totalElements: 1,
@@ -255,11 +471,249 @@
                             description: "Não autenticado"
                         }
                     }
+                },
+                post: {
+                    tags: ["Pedidos"],
+                    summary: "Criar pedido",
+                    requestBody: {
+                        required: true,
+                        content: {
+                            "application/json": {
+                                example: {
+                                    cliente: {
+                                        nome: "Gustavo",
+                                        telefone: "71999999999",
+                                        endereco: "Rua A, 123",
+                                        bairroId: 1
+                                    },
+                                    observacao: "Entregar sem tocar a campainha. Apartamento 302.",
+                                    itens: [
+                                        {
+                                            produtoId: 1,
+                                            quantidade: 2,
+                                            observacao: "Bem passado",
+                                            acrescimos: [
+                                                {
+                                                    nome: "Queijo extra",
+                                                    preco: 3.0
+                                                },
+                                                {
+                                                    nome: "Bacon",
+                                                    preco: 4.0
+                                                }
+                                            ],
+                                            remocoes: [
+                                                { nome: "Cebola" },
+                                                { nome: "Picles" }
+                                            ]
+                                        },
+                                        {
+                                            produtoId: 2,
+                                            quantidade: 1,
+                                            observacao: "Sem molho especial",
+                                            acrescimos: [
+                                                {
+                                                    nome: "Cheddar",
+                                                    preco: 2.5
+                                                }
+                                            ],
+                                            remocoes: [
+                                                { nome: "Tomate" }
+                                            ]
+                                        }
+                                    ],
+                                    cupomId: 1,
+                                    formaPagamento: "PIX"
+                                }
+                            }
+                        }
+                    },
+                    responses: {
+                        "200": {
+                            description: "Pedido criado com sucesso",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        id: 1,
+                                        cliente: {
+                                            nome: "Gustavo",
+                                            telefone: "71999999999",
+                                            endereco: "Rua A, 123",
+                                            bairroId: 1
+                                        },
+                                        observacao: "Entregar sem tocar a campainha. Apartamento 302.",
+                                        itens: [
+                                            {
+                                                produtoId: 1,
+                                                quantidade: 2,
+                                                preco: 25.0,
+                                                observacao: "Bem passado",
+                                                acrescimos: [
+                                                    {
+                                                        nome: "Queijo extra",
+                                                        preco: 3.0
+                                                    },
+                                                    {
+                                                        nome: "Bacon",
+                                                        preco: 4.0
+                                                    }
+                                                ],
+                                                remocoes: [
+                                                    { nome: "Cebola" },
+                                                    { nome: "Picles" }
+                                                ]
+                                            },
+                                            {
+                                                produtoId: 2,
+                                                quantidade: 1,
+                                                preco: 18.0,
+                                                observacao: "Sem molho especial",
+                                                acrescimos: [
+                                                    {
+                                                        nome: "Cheddar",
+                                                        preco: 2.5
+                                                    }
+                                                ],
+                                                remocoes: [
+                                                    { nome: "Tomate" }
+                                                ]
+                                            }
+                                        ],
+                                        cupomId: 1,
+                                        formaPagamento: "PIX",
+                                        status: "PENDENTE",
+                                        dataCriacao: "2026-03-29T15:40:00",
+                                        total: 76.95
+                                    }
+                                }
+                            }
+                        },
+                        "400": {
+                            description: "Erro de regra de negócio",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        timestamp: "2026-03-29T16:10:00",
+                                        status: 400,
+                                        erro: "Bad Request",
+                                        mensagem: "Pedido deve ter pelo menos um item",
+                                        path: "/pedidos"
+                                    }
+                                }
+                            }
+                        },
+                        "404": {
+                            description: "Recurso não encontrado",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        timestamp: "2026-03-29T16:10:00",
+                                        status: 404,
+                                        erro: "Not Found",
+                                        mensagem: "Produto não encontrado",
+                                        path: "/pedidos"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+
+            "/pedidos/{id}": {
+                get: {
+                    tags: ["Pedidos"],
+                    summary: "Buscar pedido por ID",
+                    parameters: [
+                        { name: "id", in: "path", required: true, example: 1 }
+                    ],
+                    responses: {
+                        "200": {
+                            description: "Pedido encontrado",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        id: 1,
+                                        cliente: {
+                                            nome: "Gustavo",
+                                            telefone: "999999999",
+                                            endereco: "Rua A",
+                                            bairroId: 1
+                                        },
+                                        observacao: "Entregar sem tocar a campainha",
+                                        itens: [
+                                            {
+                                                produtoId: 1,
+                                                quantidade: 2,
+                                                preco: 25.0,
+                                                observacao: "Bem passado",
+                                                acrescimos: [
+                                                    {
+                                                        nome: "Queijo extra",
+                                                        preco: 3.0
+                                                    }
+                                                ],
+                                                remocoes: [
+                                                    { nome: "Cebola" }
+                                                ]
+                                            }
+                                        ],
+                                        cupomId: null,
+                                        formaPagamento: "PIX",
+                                        status: "PENDENTE",
+                                        dataCriacao: "2026-03-29T15:40:00",
+                                        total: 66.0
+                                    }
+                                }
+                            }
+                        },
+                        "404": {
+                            description: "Pedido não encontrado",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        timestamp: "2026-03-29T16:10:00",
+                                        status: 404,
+                                        erro: "Not Found",
+                                        mensagem: "Pedido não encontrado",
+                                        path: "/pedidos/999"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                delete: {
+                    tags: ["Pedidos"],
+                    summary: "Deletar pedido",
+                    parameters: [
+                        { name: "id", in: "path", required: true, example: 1 }
+                    ],
+                    responses: {
+                        "200": {
+                            description: "Pedido removido com sucesso"
+                        },
+                        "404": {
+                            description: "Pedido não encontrado",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        timestamp: "2026-03-29T16:10:00",
+                                        status: 404,
+                                        erro: "Not Found",
+                                        mensagem: "Pedido não encontrado",
+                                        path: "/pedidos/999"
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             },
 
             "/pedidos/{id}/status": {
                 patch: {
+                    tags: ["Pedidos"],
                     summary: "Atualizar status do pedido",
                     parameters: [
                         {
@@ -281,7 +735,29 @@
                     },
                     responses: {
                         "200": {
-                            description: "Status atualizado"
+                            description: "Status atualizado com sucesso",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        id: 1,
+                                        status: "APROVADO"
+                                    }
+                                }
+                            }
+                        },
+                        "400": {
+                            description: "Transição inválida de status",
+                            content: {
+                                "application/json": {
+                                    example: {
+                                        timestamp: "2026-03-29T16:10:00",
+                                        status: 400,
+                                        erro: "Bad Request",
+                                        mensagem: "Status inválido para pedido PENDENTE",
+                                        path: "/pedidos/1/status"
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -289,6 +765,7 @@
 
             "/produtos": {
                 get: {
+                    tags: ["Produtos"],
                     summary: "Listar produtos",
                     responses: {
                         "200": {
@@ -324,6 +801,7 @@
                     }
                 },
                 post: {
+                    tags: ["Produtos"],
                     summary: "Criar produto",
                     requestBody: {
                         content: {
@@ -376,6 +854,7 @@
 
             "/produtos/{id}": {
                 get: {
+                    tags: ["Produtos"],
                     summary: "Buscar produto por ID",
                     parameters: [
                         { name: "id", in: "path", required: true, example: 1 }
@@ -414,6 +893,7 @@
                     }
                 },
                 put: {
+                    tags: ["Produtos"],
                     summary: "Atualizar produto",
                     parameters: [
                         { name: "id", in: "path", required: true, example: 1 }
@@ -466,6 +946,7 @@
                     }
                 },
                 delete: {
+                    tags: ["Produtos"],
                     summary: "Deletar produto",
                     parameters: [
                         { name: "id", in: "path", required: true, example: 1 }
@@ -494,6 +975,7 @@
 
             "/categorias": {
                 get: {
+                    tags: ["Categorias"],
                     summary: "Listar categorias",
                     responses: {
                         "200": {
@@ -510,6 +992,7 @@
                     }
                 },
                 post: {
+                    tags: ["Categorias"],
                     summary: "Criar categoria",
                     requestBody: {
                         required: true,
@@ -539,6 +1022,7 @@
 
             "/categorias/{id}": {
                 get: {
+                    tags: ["Categorias"],
                     summary: "Buscar categoria por ID",
                     parameters: [
                         { name: "id", in: "path", required: true, example: 1 }
@@ -571,8 +1055,8 @@
                         }
                     }
                 },
-
                 put: {
+                    tags: ["Categorias"],
                     summary: "Atualizar categoria",
                     parameters: [
                         { name: "id", in: "path", required: true, example: 1 }
@@ -615,8 +1099,8 @@
                         }
                     }
                 },
-
                 delete: {
+                    tags: ["Categorias"],
                     summary: "Deletar categoria",
                     parameters: [
                         { name: "id", in: "path", required: true, example: 1 }
@@ -645,6 +1129,7 @@
 
             "/bairros": {
                 get: {
+                    tags: ["Bairros"],
                     summary: "Listar bairros",
                     responses: {
                         "200": {
@@ -668,8 +1153,8 @@
                         }
                     }
                 },
-
                 post: {
+                    tags: ["Bairros"],
                     summary: "Criar bairro",
                     requestBody: {
                         required: true,
@@ -701,6 +1186,7 @@
 
             "/bairros/{id}": {
                 get: {
+                    tags: ["Bairros"],
                     summary: "Buscar bairro por ID",
                     parameters: [
                         { name: "id", in: "path", required: true, example: 1 }
@@ -734,8 +1220,8 @@
                         }
                     }
                 },
-
                 put: {
+                    tags: ["Bairros"],
                     summary: "Atualizar bairro",
                     parameters: [
                         { name: "id", in: "path", required: true, example: 1 }
@@ -780,8 +1266,8 @@
                         }
                     }
                 },
-
                 delete: {
+                    tags: ["Bairros"],
                     summary: "Deletar bairro",
                     parameters: [
                         { name: "id", in: "path", required: true, example: 1 }
@@ -807,15 +1293,19 @@
                     }
                 }
             }
-
         }
     };
 
     SwaggerUIBundle({
         spec: spec,
-        dom_id: '#swagger-ui'
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        persistAuthorization: true,
+        displayRequestDuration: true,
+        docExpansion: "list",
+        defaultModelsExpandDepth: 1,
+        defaultModelExpandDepth: 1
     });
 </script>
-
 </body>
 </html>

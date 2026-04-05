@@ -22,4 +22,15 @@ public class ItemPedido {
     private Integer quantidade;
 
     private Double preco;
+
+    @Column(columnDefinition = "TEXT")
+    private String observacao;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "item_pedido_id")
+    private java.util.List<ItemPedidoAcrescimo> acrescimos;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "item_pedido_id")
+    private java.util.List<ItemPedidoRemocao> remocoes;
 }

@@ -40,4 +40,7 @@ public class Pedido {
     private LocalDateTime dataCriacao;
 
     private Double total;
+
+    @Column(columnDefinition = "TEXT")
+    private String observacao;
 }

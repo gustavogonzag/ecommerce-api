@@ -26,6 +26,8 @@ public class JwtFilter implements Filter {
 
         // libera login
         if (path.contains("/auth/login") ||
+                path.contains("/produtos") ||
+                path.contains("/categorias") ||
                 path.contains("/swagger") ||
                 path.contains("/v3/api-docs") ||
                 path.contains("/swagger-ui")) {
@@ -45,6 +47,11 @@ public class JwtFilter implements Filter {
 
         if (!jwtService.tokenValido(token)) {
             ((HttpServletResponse) response).setStatus(401);
+            return;
+        }
+
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
             return;
         }
 

@@ -38,7 +38,7 @@ public class PedidoService {
 
         Pedido pedido = new Pedido();
 
-        // 🔹 Cliente + Bairro
+        // Cliente + Bairro
         ClientePedidoDTO c = dto.getCliente();
 
         Bairro bairro = bairroRepository.findById(c.getBairroId())
@@ -53,7 +53,10 @@ public class PedidoService {
 
         pedido.setCliente(cliente);
 
-        // 🔥 CÁLCULO DO TOTAL
+        // Observação geral do pedido
+        pedido.setObservacao(dto.getObservacao());
+
+        // Cálculo do total
         double total = 0.0;
 
         List<ItemPedido> itens = new java.util.ArrayList<>();
@@ -68,24 +71,66 @@ public class PedidoService {
                     .orElseThrow(() -> new RecursoNaoEncontradoException("Produto não encontrado"));
 
             if (!produto.getAtivo()) {
-                throw new RuntimeException("Produto inativo");
+                throw new RegraNegocioException(
+                        "O produto '" + produto.getNome() + "' está indisponível no momento."
+                );
             }
 
             double preco = produto.getPreco();
-            double subtotal = preco * i.getQuantidade();
+            double subtotalBase = preco * i.getQuantidade();
 
+            // Acréscimos do item
+            List<ItemPedidoAcrescimo> acrescimos = new java.util.ArrayList<>();
+            double totalAcrescimos = 0.0;
+
+            if (i.getAcrescimos() != null && !i.getAcrescimos().isEmpty()) {
+                for (ItemPedidoAcrescimoDTO a : i.getAcrescimos()) {
+
+                    ItemPedidoAcrescimo acrescimo = new ItemPedidoAcrescimo();
+                    acrescimo.setNome(a.getNome());
+                    acrescimo.setPreco(a.getPreco());
+
+                    acrescimos.add(acrescimo);
+
+                    if (a.getPreco() != null && a.getPreco() > 0) {
+                        totalAcrescimos += a.getPreco() * i.getQuantidade();
+                    }
+                }
+            }
+
+            // Remoções do item
+            List<ItemPedidoRemocao> remocoes = new java.util.ArrayList<>();
+
+            if (i.getRemocoes() != null && !i.getRemocoes().isEmpty()) {
+                for (ItemPedidoRemocaoDTO r : i.getRemocoes()) {
+                    ItemPedidoRemocao remocao = new ItemPedidoRemocao();
+                    remocao.setNome(r.getNome());
+
+                    remocoes.add(remocao);
+                }
+            }
+
+            double subtotal = subtotalBase + totalAcrescimos;
             total += subtotal;
 
-            itens.add(new ItemPedido(null, produto, i.getQuantidade(), preco));
+            ItemPedido itemPedido = new ItemPedido();
+            itemPedido.setProduto(produto);
+            itemPedido.setQuantidade(i.getQuantidade());
+            itemPedido.setPreco(preco);
+            itemPedido.setObservacao(i.getObservacao());
+            itemPedido.setAcrescimos(acrescimos);
+            itemPedido.setRemocoes(remocoes);
+
+            itens.add(itemPedido);
         }
 
         pedido.setItens(itens);
 
-        // 🔹 Taxa de entrega
+        // Taxa de entrega
         double taxaEntrega = bairro.getTaxaEntrega() != null ? bairro.getTaxaEntrega() : 0.0;
         total += taxaEntrega;
 
-        // 🔹 Cupom
+        // Cupom
         if (dto.getCupomId() != null) {
 
             Cupom cupom = cupomRepository.findById(dto.getCupomId())
@@ -109,14 +154,14 @@ public class PedidoService {
             pedido.setCupom(cupom);
         }
 
-        // 🔹 Evita total negativo
+        // Evita total negativo
         if (total < 0) {
             total = 0;
         }
 
         pedido.setTotal(total);
 
-        // 🔹 Outros campos
+        // Outros campos
         pedido.setFormaPagamento(dto.getFormaPagamento());
         pedido.setStatus(
                 dto.getStatus() != null
@@ -165,6 +210,26 @@ public class PedidoService {
             ip.setProdutoId(i.getProduto().getId());
             ip.setQuantidade(i.getQuantidade());
             ip.setPreco(i.getPreco());
+            ip.setObservacao(i.getObservacao());
+
+            if (i.getAcrescimos() != null) {
+                List<ItemPedidoAcrescimoDTO> acrescimosDTO = i.getAcrescimos()
+                        .stream()
+                        .map(a -> new ItemPedidoAcrescimoDTO(a.getNome(), a.getPreco()))
+                        .collect(Collectors.toList());
+
+                ip.setAcrescimos(acrescimosDTO);
+            }
+
+            if (i.getRemocoes() != null) {
+                List<ItemPedidoRemocaoDTO> remocoesDTO = i.getRemocoes()
+                        .stream()
+                        .map(r -> new ItemPedidoRemocaoDTO(r.getNome()))
+                        .collect(Collectors.toList());
+
+                ip.setRemocoes(remocoesDTO);
+            }
+
             return ip;
         }).collect(Collectors.toList()));
 
@@ -173,6 +238,7 @@ public class PedidoService {
         dto.setStatus(p.getStatus());
         dto.setDataCriacao(p.getDataCriacao());
         dto.setTotal(p.getTotal());
+        dto.setObservacao(p.getObservacao());
 
         return dto;
     }
